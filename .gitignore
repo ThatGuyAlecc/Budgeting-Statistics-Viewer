@@ -1,0 +1,5 @@
+.venv
+database.db
+export.csv
+__pycache__/
+data_pipeline_project.odt
