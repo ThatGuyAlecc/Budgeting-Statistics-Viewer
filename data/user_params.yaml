@@ -1,0 +1,8 @@
+# Replace the values for budgets with your own budgets
+budgets:
+    'Food & Necessities': 500
+    'Clothing': 150
+    'Entertainment': 200
+    'Transportation': 300
+    'Sports & Fitness': 100
+    'Other': 100

@@ -1,6 +1,7 @@
 import csv
 import sqlite3
 import pandas as pd
+import yaml
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent
@@ -11,6 +12,38 @@ def read_data():
         reader = csv.reader(file, delimiter=';')
         data = list(reader)
     return data
+
+def read_user_params():
+    try:
+        with open(DATA_DIR / "user_params.yaml", "r") as file:
+            data = yaml.safe_load(file)
+        
+        if data is None:
+            print("Warning: user_params.yaml is empty")
+            return pd.DataFrame(columns=['Category', 'Budget'])
+        
+        # Get budgets from the YAML file
+        if isinstance(data, dict) and "budgets" in data:
+            budget_dict = data["budgets"]
+        elif isinstance(data, dict):
+            # If the YAML file is just a flat dictionary of budgets
+            budget_dict = data
+        else:
+            print("Warning: Invalid YAML structure")
+            return pd.DataFrame(columns=['Category', 'Budget'])
+        
+        if budget_dict:
+            budget_df = pd.DataFrame(list(budget_dict.items()), columns=['Category', 'Budget'])
+            return budget_df
+        else:
+            return pd.DataFrame(columns=['Category', 'Budget'])
+            
+    except FileNotFoundError:
+        print(f"Warning: {DATA_DIR / 'user_params.yaml'} not found")
+        return pd.DataFrame(columns=['Category', 'Budget'])
+    except Exception as e:
+        print(f"Error reading budgets: {e}")
+        return pd.DataFrame(columns=['Category', 'Budget'])
 
 def init_db():
     print("Initializing database...")
@@ -58,5 +91,5 @@ def get_total_stats(conn):
                    sum(CASE WHEN amount > 0 THEN amount ELSE 0 END) AS total_income
                    FROM transactions
                    ''')
-    stats = cursor.fetchall()
-    return stats
+    stats = cursor.fetchone()
+    return [stats]

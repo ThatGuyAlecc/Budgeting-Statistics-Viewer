@@ -1,1 +1,1 @@
-Name your transactions .csv file "export.csv" and put it in this directory, then run main.py
+Name your transactions .csv file "export.csv" and put it in this directory, and input your own budget values into user_params.yaml, then run main.py

@@ -1,5 +1,5 @@
 from extract import init_db, get_stats_per_category, get_total_stats
-from load import load_data
+from load import load_data, create_output_file
 from transform import transform_data
 
 
@@ -11,8 +11,8 @@ def main():
 
     df = transform_data()
     load_data(df, conn)
-    print(get_stats_per_category(conn))
-    print(get_total_stats(conn))
+    create_output_file(get_stats_per_category(conn), get_total_stats(conn))
+
     conn.close()
 
     print("ETL pipeline completed successfully.")
