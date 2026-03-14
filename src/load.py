@@ -1,4 +1,4 @@
-import sqlite3
+
 from urllib import response
 import requests
 import io
@@ -18,14 +18,12 @@ def load_data(df, conn):
 
 
 def create_output_file(stats_per_category, total_stats):
-    # Get budget data
     budget_df = read_user_params()
     budgets = dict(zip(budget_df['Category'], budget_df['Budget']))
     
     spending = {category: abs(amount) for category, amount in stats_per_category}
     comparison = compare_budgets_with_spending(budgets, spending)
 
-    # Write to text file
     with open('output.txt', 'w') as f:
         f.write("=" * 60 + "\n")
         f.write("BUDGET vs SPENDING COMPARISON\n")
@@ -37,13 +35,25 @@ def create_output_file(stats_per_category, total_stats):
         
         for category, data in comparison.items():
             f.write(f"Category: {category}\n")
-            f.write(f"  Budget:     ${data['budget']:.2f}\n")
-            f.write(f"  Spent:      ${data['spent']:.2f}\n")
-            f.write(f"  Difference: ${data['difference']:.2f}")
-            if data['difference'] < 0:
-                f.write(" (OVER BUDGET!)\n")
+            if isinstance(data['budget'], (int, float)):
+                budget_display = f"${data['budget']:.2f}"
             else:
+                budget_display = str(data['budget'])
+
+            if isinstance(data['difference'], (int, float)):
+                difference_display = f"${data['difference']:.2f}"
+            else:
+                difference_display = str(data['difference'])
+
+            f.write(f"  Budget:     {budget_display}\n")
+            f.write(f"  Spent:      ${data['spent']:.2f}\n")
+            f.write(f"  Difference: {difference_display}")
+            if isinstance(data['difference'], (int, float)) and data['difference'] < 0:
+                f.write(" (OVER BUDGET!)\n")
+            elif isinstance(data['difference'], (int, float)):
                 f.write(" (Under budget)\n")
+            else:
+                f.write(" (No budget value)\n")
             f.write("-" * 60 + "\n")
         
         f.write("\n" + "=" * 60 + "\n")

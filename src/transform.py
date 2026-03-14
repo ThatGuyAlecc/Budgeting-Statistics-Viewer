@@ -31,8 +31,18 @@ def calculate_budget(df, budgets):
 def compare_budgets_with_spending(budgets, spending):
     comparison = {}
     for category in budgets:
-        budget = float(budgets[category])
         spent = spending.get(category, 0)
+
+        if budgets[category] is None or pd.isna(budgets[category]) or budgets[category] == '':
+            print(f"Error: Missing budget value for category '{category}'.")
+            comparison[category] = {
+                'budget': '-',
+                'spent': spent,
+                'difference': '-'
+            }
+            continue
+
+        budget = float(budgets[category])
         comparison[category] = {
             'budget': budget,
             'spent': spent,
